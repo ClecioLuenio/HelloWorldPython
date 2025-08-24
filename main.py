@@ -12,6 +12,7 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('Hello World em Python')
+    print_hi("olá mundo")
     x = input("Digite qual seu nome\n")
     print(f"olá {x} seja bem vindo(a) ao meu algoritmo em python")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
