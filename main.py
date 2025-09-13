@@ -1,18 +1,56 @@
-# This is a sample Python script.
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# 1) Carregar dataset (ajuste o nome do arquivo caso diferente)
+df = pd.read_csv("patients.csv")
 
+# 2) Explorar os dados
+print("Primeiras linhas do dataset:")
+print(df.head())
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+print("\nDistribuição da variável alvo (Risk_Level):")
+print(df["Risk_Level"].value_counts())
 
+# 3) Pré-processamento
+# Remover colunas que não ajudam no modelo
+df = df.drop(columns=["Patient_ID"])
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('Hello World em Python')
-    print_hi("olá mundo")
-    x = input("Digite qual seu nome\n")
-    print(f"olá {x} seja bem vindo(a) ao meu algoritmo em python")
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# Transformar colunas categóricas em numéricas
+le = LabelEncoder()
+df["Consciousness"] = le.fit_transform(df["Consciousness"])
+df["Risk_Level"] = le.fit_transform(df["Risk_Level"])  # variável alvo
+
+# 4) Definir variáveis independentes (X) e alvo (y)
+X = df.drop(columns=["Risk_Level"])
+y = df["Risk_Level"]
+
+# 5) Dividir treino e teste
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 6) Treinar modelo
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# 7) Avaliar modelo
+y_pred = model.predict(X_test)
+print("\nMatriz de Confusão:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nRelatório de Classificação:")
+print(classification_report(y_test, y_pred))
+
+# 8) Visualizar importância das variáveis
+importances = model.feature_importances_
+feature_names = X.columns
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x=importances, y=feature_names)
+plt.title("Importância das Variáveis")
+plt.show()
